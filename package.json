@@ -38,6 +38,7 @@
     "@html-eslint/parser": "^0.34.0",
     "@jest/globals": "^29.7.0",
     "@parcel/packager-raw-url": "^2.13.3",
+    "@parcel/service-worker": "^2.13.3",
     "@parcel/transformer-sass": "^2.13.3",
     "@parcel/transformer-webmanifest": "^2.13.3",
     "@types/bun": "^1.2.2",
