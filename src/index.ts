@@ -26,6 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
       closeAllModals();
     }
   });
+
+  
 });
 
 (document.getElementById('fit2labradar') as HTMLFormElement).addEventListener("change", handleFiles ,false);
