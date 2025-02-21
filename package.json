@@ -7,12 +7,12 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "parcel src/index.html src/sitemap.txt src/robots.txt",
-    "build": "parcel build src/index.html src/sitemap.txt src/robots.txt",
+    "start": "parcel src/index.html src/sitemap.txt src/robots.txt src/manifest.json src/js/service-worker.js",
+    "build": "parcel build src/index.html src/sitemap.txt src/robots.txt src/manifest.json src/js/service-worker.js",
     "bunbuild": "bun build ./src/index.ts --outdir ./out",
     "test": "bun test",
-    "predeploy": "rm -rf dist && rm -rf .parcel-cache && parcel build src/index.html src/sitemap.txt src/robots.txt --public-url ./",
-    "predeploy-win": "rmdir dist /s /q && rmdir .parcel-cache /s /q  && parcel build src/index.html src/sitemap.txt src/robots.txt --public-url ./",
+    "predeploy": "rm -rf dist && rm -rf .parcel-cache && parcel build src/index.html src/sitemap.txt src/robots.txt src/manifest.json src/js/service-worker.js --public-url ./",
+    "predeploy-win": "rmdir dist /s /q && rmdir .parcel-cache /s /q  && parcel build src/index.html src/sitemap.txt src/robots.txt src/manifest.json src/js/service-worker.js --public-url ./",
     "deploy": "gh-pages -d dist"
   },
   "repository": {
@@ -37,7 +37,9 @@
     "@html-eslint/eslint-plugin": "^0.34.0",
     "@html-eslint/parser": "^0.34.0",
     "@jest/globals": "^29.7.0",
+    "@parcel/packager-raw-url": "^2.13.3",
     "@parcel/transformer-sass": "^2.13.3",
+    "@parcel/transformer-webmanifest": "^2.13.3",
     "@types/bun": "^1.2.2",
     "@types/papaparse": "^5.3.15",
     "babel-jest": "^29.7.0",
