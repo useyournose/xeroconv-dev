@@ -52,6 +52,9 @@
       }
     }
   ],
+  "launch_handler": {
+    "client_mode": ["focus-existing", "auto"]
+  },
   "start_url": ".",
   "scope": "/",
   "background_color": "#ffffff",
