@@ -1,41 +1,67 @@
 {
-    "short_name": "XeroConv",
-    "name": "XeroConv - Converter for Garmin Xero files",
-    "icons": [
-      {
-        "src": "assets/windows-44x44.png",
-        "sizes": "44x44",
-        "type": "image/png",
-        "purpose": "any"
+  "short_name": "XeroConv",
+  "name": "XeroConv - Converter for Garmin Xero files",
+  "icons": [
+    {
+      "src": "assets/windows-44x44.png",
+      "sizes": "44x44",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/maskable_icon_x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+      }
+  ],
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "tect/csv": [
+          ".csv"
+        ],
+        "application/vnd.ms-excel" : [
+          ".xls"
+        ],
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
+          ".xlsx"
+        ],
+        "application/vnd.ant.fit": [
+          ".fit"
+        ]
       },
-      {
-        "src": "assets/apple-touch-icon.png",
-        "sizes": "180x180",
-        "type": "image/png",
-        "purpose": "any"
-      },
-      {
-        "src": "assets/android-chrome-192x192.png",
-        "sizes": "192x192",
-        "type": "image/png",
-        "purpose": "any"
-      },
-      {
-        "src": "assets/android-chrome-512x512.png",
-        "sizes": "512x512",
-        "type": "image/png",
-        "purpose": "any"
-      },
-      {
-        "src": "assets/maskable_icon_x192.png",
-        "sizes": "192x192",
-        "type": "image/png",
-        "purpose": "any maskable"
+      "icons": [
+        {
+          "src": "assets/android-chrome-512x512.png",
+          "sizes": "512x512",
+          "type": "image/png"
         }
-    ],
-    "start_url": ".",
-    "scope": "/",
-    "background_color": "#ffffff",
-    "display": "standalone",
-    "theme_color": "#ffffff"
-  }
+      ]
+    }
+  ],
+  "start_url": ".",
+  "scope": "/",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "theme_color": "#ffffff"
+}
