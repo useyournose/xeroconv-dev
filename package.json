@@ -1,6 +1,6 @@
 {
   "name": "xeroconv",
-  "version": "1.0.20250222-2",
+  "version": "1.0.20250222-3",
   "description": "converts garmin xero and garmin shotview files",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "directories": {

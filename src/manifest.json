@@ -49,14 +49,7 @@
         "application/vnd.ant.fit": [
           ".fit"
         ]
-      },
-      "icons": [
-        {
-          "src": "assets/android-chrome-512x512.png",
-          "sizes": "512x512",
-          "type": "image/png"
-        }
-      ]
+      }
     }
   ],
   "start_url": ".",
