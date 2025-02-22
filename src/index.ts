@@ -1,6 +1,15 @@
 import handleFiles from "./js/handleFiles";
 import { openModal, closeModal, closeAllModals } from "./js/modals";
 
+declare global {
+  interface Window {
+      launchQueue: {
+          setConsumer: (launchParams:any) => void;
+      };
+  }
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
 
   // Add a click event on buttons to open a specific modal
@@ -38,6 +47,19 @@ document.addEventListener('DOMContentLoaded', () => {
       $target.classList.toggle('is-active');
     });
   });
+
+  if ('launchQueue' in window) {
+    console.log('File Handling API is supported!');
+      if ('setConsumer' in window.launchQueue) {
+      window.launchQueue.setConsumer((launchParams:any) => {
+          handleFiles();
+      });
+    }
+} else {
+    console.error('File Handling API is not supported!');
+}
+
+
   
 });
 

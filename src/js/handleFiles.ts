@@ -19,13 +19,13 @@ export default function handleFiles() {
     fileReader.onload = async function (event) {
       if (event.target) {
         const FileData = event.target.result as ArrayBuffer;
-        if (sourceid == 'fit2labradar') {
+        if (sourceid == 'fit2labradar' || /\.fit$/g.test(filename)) {
           const result_f:Promise<string> = fit2labradar(FileData, filename)
           result_f.then((value) => {console.log("[handlefiles]: success")},(error) => {showError(error)});
-        } else if (sourceid == 'csv2labradar') {
+        } else if (sourceid == 'csv2labradar' || /\.csv$/g.test(filename)) {
           const result_c:Promise<string> = csv2labradar(FileData, filename);
           result_c.then((value) => {console.log("[handlefiles]: success")},(error) => {showError(error)});
-        } else if (sourceid == 'xls2labradar') {
+        } else if (sourceid == 'xls2labradar' || /\.xlsx?$/g.test(filename)) {
           const result_x:Promise<string> = xls2labradar(FileData, filename);
           result_x.then((value) => {console.log("[handlefiles]: success")},(error) => {showError(error)});
         } else {
