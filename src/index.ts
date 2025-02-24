@@ -1,6 +1,7 @@
 import handleFiles from "./js/handleFiles";
 import { openModal, closeModal, closeAllModals } from "./js/modals";
 import { LaunchParams } from "./js/_types";
+import { handleFilesPwa } from "./js/handlefiles-pwa";
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -46,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window.launchQueue.setConsumer((launchParams) => {
           console.log(launchParams.files)
           if (launchParams.files.length > 0) {
-            handleFiles(launchParams.files, "pwa");
+            handleFilesPwa(launchParams.files);
           }
       });
     }
