@@ -1,4 +1,4 @@
-
+//found  here https://github.com/christianliebel/paint/blob/6b4703cabfb818683c348c212651923a282d3aab/types/static.d.ts#L8
 export interface BeforeInstallPromptEvent extends Event {
     readonly platforms: string[];
     readonly userChoice: Promise<{
