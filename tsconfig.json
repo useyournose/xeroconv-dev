@@ -7,7 +7,7 @@
       //"outFile": "../../built/local/tsc.js",
       "sourceMap": true,
       "target": "ES2022",
-      "lib": ["webworker"],
+      "lib": ["webworker","DOM"],
       //"allowImportingTsExtensions": true
     },
     "include": ["src/**/*.ts"],

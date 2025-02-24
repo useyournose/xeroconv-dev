@@ -1,14 +1,6 @@
 import handleFiles from "./js/handleFiles";
 import { openModal, closeModal, closeAllModals } from "./js/modals";
-
-declare global {
-  interface Window {
-      launchQueue: {
-          setConsumer: (launchParams:any) => void;
-      };
-  }
-}
-
+import { LaunchParams } from "./js/_types";
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -51,13 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('launchQueue' in window) {
     console.log('File Handling API is supported!');
       if ('setConsumer' in window.launchQueue) {
-      window.launchQueue.setConsumer((launchParams:any) => {
+      window.launchQueue.setConsumer((launchParams) => {
+          console.log(launchParams.files)
           handleFiles();
       });
     }
-} else {
-    console.error('File Handling API is not supported!');
-}
+  } else {
+      console.error('File Handling API is not supported!');
+  }
 
 
   
