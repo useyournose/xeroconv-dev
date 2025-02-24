@@ -17,20 +17,18 @@ async function fileSystemHandleToArrayBuffer(fileHandle: FileSystemFileHandle):
 
 export async function handleFilesPwa(files:readonly FileSystemFileHandle[]) {
     for (const file of files) {
-        fileSystemHandleToArrayBuffer(file).then(arrayBuffer => {
-            if (/\.fit$/g.test(file.name)) {
-                const result_f:Promise<string> = fit2labradar(arrayBuffer, file.name)
-                result_f.then((value) => {console.log("[handlefiles]: success")},(error) => {showError(error)});
-            } else if (/\.csv$/g.test(file.name)) {
-                const result_c:Promise<string> = csv2labradar(arrayBuffer, file.name);
-                result_c.then((value) => {console.log("[handlefiles]: success")},(error) => {showError(error)});
-            } else if (/\.xlsx?$/g.test(file.name)) {
-                const result_x:Promise<string> = xls2labradar(arrayBuffer, file.name);
-                result_x.then((value) => {console.log("[handlefiles]: success")},(error) => {showError(error)});
-            } else {
-                console.error('[handlefiles]: what is ' + file.name + ' doing here?');
-            }
-        })
-        
-    }
+        const fileData = await fileSystemHandleToArrayBuffer(file)
+        if (/\.fit$/g.test(file.name)) {
+            const result_f:Promise<string> = fit2labradar(fileData, file.name)
+            result_f.then((value) => {console.log("[handlefiles]: success")},(error) => {showError(error)});
+        } else if (/\.csv$/g.test(file.name)) {
+            const result_c:Promise<string> = csv2labradar(fileData, file.name);
+            result_c.then((value) => {console.log("[handlefiles]: success")},(error) => {showError(error)});
+        } else if (/\.xlsx?$/g.test(file.name)) {
+            const result_x:Promise<string> = xls2labradar(fileData, file.name);
+            result_x.then((value) => {console.log("[handlefiles]: success")},(error) => {showError(error)});
+        } else {
+            console.error('[handlefiles]: what is ' + file.name + ' doing here?');
+        }
+    }      
 }
