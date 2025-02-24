@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window.launchQueue.setConsumer((launchParams) => {
           console.log(launchParams.files)
           if (launchParams.files.length > 0) {
-            handleFiles();
+            handleFiles(launchParams.files, "pwa");
           }
       });
     }

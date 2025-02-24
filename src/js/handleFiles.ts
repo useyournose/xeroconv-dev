@@ -4,9 +4,10 @@ import csv2labradar from "./csv2labradar";
 import xls2labradar from "./xls2labradar_v2";
 import { showError } from "./messages";
 
-export default function handleFiles() {
-  const fileList = this.files;
-  const sourceid = this.id;
+export default function handleFiles(_filelist?:readonly FileSystemFileHandle[], _sourceid?:string) {
+  const fileList = this ? this.files : _filelist;
+  const sourceid = this ? this.sourceid : _sourceid;
+
   if (fileList.length == 0) {
     console.log("[handlefiles]: no Files in " + sourceid);
     return;
