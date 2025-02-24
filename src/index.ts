@@ -45,7 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if ('setConsumer' in window.launchQueue) {
       window.launchQueue.setConsumer((launchParams) => {
           console.log(launchParams.files)
-          handleFiles();
+          if (launchParams.files.length > 0) {
+            handleFiles();
+          }
       });
     }
   } else {
