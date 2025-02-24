@@ -1,17 +1,25 @@
 {
   "name": "xeroconv",
-  "version": "1.0.20250224.1",
+  "version": "1.0.20250224.2",
   "description": "converts garmin xero and garmin shotview files",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "directories": {
     "doc": "docs"
   },
+  "source": [
+    "src/index.html",
+    "src/sitemap.txt",
+    "src/robots.txt"
+  ],
   "scripts": {
-    "start": "parcel src/index.html src/sitemap.txt src/robots.txt src/manifest.json src/js/service-worker.js",
-    "build": "parcel build src/index.html src/sitemap.txt src/robots.txt src/manifest.json src/js/service-worker.js",
-    "bunbuild": "bun build ./src/index.ts --outdir ./out",
+    "start-old": "parcel src/index.html src/sitemap.txt src/robots.txt src/manifest.json src/js/service-worker.js",
+    "start": "parcel",
+    "build-old": "parcel build src/index.html src/sitemap.txt src/robots.txt src/manifest.json src/js/service-worker.js",
+    "build": "parcel build",
+    "bunbuild": "bun build ./src/index.html ./src/index.ts --outdir ./out --target browser",
     "test": "bun test",
-    "predeploy": "rm -rf dist && rm -rf .parcel-cache && parcel build src/index.html src/sitemap.txt src/robots.txt src/manifest.json src/js/service-worker.js --public-url ./",
+    "predeploy-old": "rm -rf dist && rm -rf .parcel-cache && parcel build src/index.html src/sitemap.txt src/robots.txt src/manifest.json src/js/service-worker.js --public-url ./",
+    "predeploy": "rm -rf dist && rm -rf .parcel-cache && parcel build --public-url ./",
     "predeploy-win": "rmdir dist /s /q && rmdir .parcel-cache /s /q  && parcel build src/index.html src/sitemap.txt src/robots.txt src/manifest.json src/js/service-worker.js --public-url ./",
     "deploy": "gh-pages -d dist"
   },
