@@ -1,8 +1,5 @@
 import {manifest, version} from '@parcel/service-worker';
 
-console.log("version:" + version)
-console.log("Manifest:" + manifest)
-
 async function install() {
     const cache = await caches.open(version);
     await cache.addAll(manifest);

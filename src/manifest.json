@@ -55,7 +55,7 @@
   "launch_handler": {
     "client_mode": ["focus-existing", "auto"]
   },
-  "start_url": ".",
+  "start_url": "xeroconv-dev",
   "scope": "/",
   "background_color": "#ffffff",
   "display": "standalone",
