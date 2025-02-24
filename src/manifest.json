@@ -55,8 +55,8 @@
   "launch_handler": {
     "client_mode": ["focus-existing", "auto"]
   },
-  "start_url": "/xeroconv-dev/",
-  "scope": "/xeroconv-dev/",
+  "start_url": ".",
+  "scope": "https://useyournose.github.io/xeroconv-dev/",
   "background_color": "#ffffff",
   "display": "standalone",
   "theme_color": "#ffffff"
