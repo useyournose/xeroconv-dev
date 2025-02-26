@@ -50,7 +50,7 @@
           ".fit"
         ]
       },
-      "launch_type": "single_client"
+      "launch_type": "single-client"
     }
   ],
   "launch_handler": {

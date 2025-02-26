@@ -1,6 +1,7 @@
-const sw = "js/service-worker.js"; // it is needed because parcel will not recognize this as a file and not precess in its manner
-navigator.serviceWorker
-    .register(sw, {type:'module'})
+navigator.serviceWorker.register(new URL("./service-worker.js", import.meta.url), {type:'module'})
+////const sw = "js/service-worker.js"; // it is needed because parcel will not recognize this as a file and not precess in its manner
+//navigator.serviceWorker
+    //.register(sw, {type:'module'})
     .then(registration => {
     registration.onupdatefound = () => {
         const installingWorker = registration.installing;
