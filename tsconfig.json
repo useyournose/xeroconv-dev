@@ -7,7 +7,7 @@
       //"outFile": "../../built/local/tsc.js",
       "sourceMap": true,
       "target": "ESNext",
-      "lib": ["webworker","DOM"],
+      "lib": ["WebWorker","DOM","ESNext"],
       //"allowImportingTsExtensions": true
     },
     "include": ["src/**/*.ts"],

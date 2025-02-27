@@ -1,6 +1,6 @@
 import handleFiles from "./js/handleFiles";
 import { openModal, closeModal, closeAllModals } from "./js/modals";
-import { LaunchParams } from "./js/_types";
+import { BeforeInstallPromptEvent, LaunchParams } from "./js/_types";
 import { handleFilesPwa } from "./js/handlefiles-pwa";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -56,7 +56,30 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 
+  //install button handling https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Trigger_install_prompt
+  let installPrompt:BeforeInstallPromptEvent = null;
+  const installButton = document.querySelector("#install");
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    installPrompt = event;
+    installButton.removeAttribute("hidden");
+  });
   
+  installButton.addEventListener("click", async () => {
+    if (!installPrompt) {
+      return;
+    }
+    const result = await installPrompt.prompt();
+    console.log(`Install prompt was: ${result}`);
+    disableInAppInstallPrompt();
+  });
+  
+  function disableInAppInstallPrompt() {
+    installPrompt = null;
+    installButton.setAttribute("hidden", "");
+  }
+
 });
 
 (document.getElementById('fit2labradar') as HTMLFormElement).addEventListener("change", handleFiles ,false);
