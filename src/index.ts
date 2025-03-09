@@ -1,4 +1,4 @@
-import handleFiles from "./js/handleFiles";
+//import handleFiles from "./js/handleFiles";
 import { openModal, closeModal, closeAllModals } from "./js/modals";
 import { BeforeInstallPromptEvent, LaunchParams } from "./js/_types";
 import { handleFilesPwa } from "./js/handlefiles-pwa";
@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // handle launch queue when started via file-handler
   if ('launchQueue' in window) {
     console.log('File Handling API is supported!');
       if ('setConsumer' in window.launchQueue) {
@@ -80,8 +81,23 @@ document.addEventListener('DOMContentLoaded', () => {
     installButton.setAttribute("hidden", "");
   }
 
+
+  /*total
+  failed
+  */
+  if (localStorage.total) {
+    console.log("total process: ", localStorage.total)
+  } else {
+    console.log("no storage there, creating it.");
+    localStorage.total = "0"
+  }
+
 });
 
-(document.getElementById('fit2labradar') as HTMLFormElement).addEventListener("change", handleFiles ,false);
-(document.getElementById('csv2labradar') as HTMLFormElement).addEventListener("change", handleFiles, false);
-(document.getElementById('xls2labradar') as HTMLFormElement).addEventListener("change", handleFiles, false);
+//registetr Eventlisteners
+(document.querySelectorAll('#fit2labradar, #csv2labradar, #xls2labradar')).forEach((element) => {
+  element.addEventListener("change",(event) => {
+    handleFilesPwa((event.target as HTMLInputElement).files)
+  }, false);
+});
+

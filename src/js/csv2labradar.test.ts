@@ -34,7 +34,7 @@ test('file should be nice - ios', () => {
   result.then((value) => {
     expect(value).toBe('true');
     expect(downloadspy).toHaveBeenCalled();
-    expect(downloadspy.mock.calls[0][1]).toBe('Shotview_i_06-04-2001_00-00-00-xeroconv.csv');
+    expect(downloadspy.mock.calls[0][1]).toBe('Shotview_i_06-04-2024_13-36-00-xeroconv.csv');
   })
 });
 
