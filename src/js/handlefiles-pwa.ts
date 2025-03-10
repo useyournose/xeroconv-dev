@@ -27,7 +27,7 @@ function fileToArrayBuffer(file:File):Promise<ArrayBuffer> {
 
 export async function handleFilesPwa(files:readonly FileSystemFileHandle[] | FileList) {
     var closeonend = false
-    var localstoragecount = Number(localStorage.total)
+    var localstoragecount = Number(localStorage.total) || 0
     if (files[0] instanceof FileSystemFileHandle) {
         closeonend = true
     }
@@ -58,7 +58,6 @@ export async function handleFilesPwa(files:readonly FileSystemFileHandle[] | Fil
     console.log("total converted Files: ", localstoragecount)
     
     if (closeonend === true) {
-        window.close
+        window.close()
     }
-    
 }
