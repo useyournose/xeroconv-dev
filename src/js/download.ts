@@ -5,14 +5,16 @@ export default function download(text:string,filename:string):Promise<boolean|st
     const blob = new Blob([text], {type: "text/plain;charset=utf-8"} )
     const file = new File([blob], filename, {type: "text/plain;charset=utf-8"})
     const files = [file]
-    if (navigator.canShare && navigator.canShare({files})) {
+    if (!(navigator.share === undefined) && navigator.canShare() && navigator.canShare({files})) {
       console.log('Sharing files is supported');
       try {
-        navigator.share({files}).then((value) => {
+        navigator.share({title : "Open " + filename, text : "with your preferred app", files : files}).then(() => {
           console.log("[download]: file "+ filename +" saved.");
           showSuccess("Saved " + filename + ".");
           resolve(true)
-        })
+        }).catch(error => {
+          console.error('Error sharing the content', error);
+        });
       } catch(err) {
         console.error("[download]: " + err);
         if (Object.hasOwn(err,'message')) {
@@ -22,7 +24,7 @@ export default function download(text:string,filename:string):Promise<boolean|st
         }
       }
     } else {
-      console.error('Sharing files is not supported');
+      console.info('Sharing files is not supported');
       try {
         //inspired from https://stackoverflow.com/a/18197341
         const element = document.createElement('a');

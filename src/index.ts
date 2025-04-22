@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("no storage there, creating it.");
     localStorage.total = "0"
   }
-
+  navigator.setAppBadge(Number(localStorage.total))
 });
 
 //registetr Eventlisteners
