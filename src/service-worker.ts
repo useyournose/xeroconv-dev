@@ -22,6 +22,7 @@ async function activate() {
 self.addEventListener('activate', e => e.waitUntil(activate()));
 
 async function cacheFirstWithRefresh(request:Request) {
+  if (!(request.url.indexOf('http') === 0)) return;
   const fetchResponsePromise = fetch(request).then(async (networkResponse) => {
     if (networkResponse.ok) {
       const cache = await caches.open(version);

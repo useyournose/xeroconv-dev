@@ -56,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('File Handling API is not supported!');
   }
 
-
   //install button handling https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Trigger_install_prompt
   let installPrompt:BeforeInstallPromptEvent = null;
   const installButton = document.querySelector("#install");
@@ -65,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     event.preventDefault();
     installPrompt = event;
     installButton.removeAttribute("hidden");
+    return false;
   });
   
   installButton.addEventListener("click", async () => {
@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const result = await installPrompt.prompt();
     console.log(`Install prompt was: ${result.outcome}`);
     disableInAppInstallPrompt();
+    installPrompt = null;
   });
   
   function disableInAppInstallPrompt() {
