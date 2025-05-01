@@ -1,6 +1,12 @@
 import {manifest, version} from '@parcel/service-worker';
 declare var self: ServiceWorkerGlobalScope;
 
+function isCacheable(request:Request) {
+  //const url = new URL(request.url);
+  //return !url.pathname.endsWith(".json");
+  return true
+}
+
 async function install() {
     const cache = await caches.open(version);
     await cache.addAll(manifest);
@@ -14,3 +20,21 @@ async function activate() {
     );
 }
 self.addEventListener('activate', e => e.waitUntil(activate()));
+
+async function cacheFirstWithRefresh(request:Request) {
+  const fetchResponsePromise = fetch(request).then(async (networkResponse) => {
+    if (networkResponse.ok) {
+      const cache = await caches.open(version);
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  });
+
+  return (await caches.match(request)) || (await fetchResponsePromise);
+}
+
+self.addEventListener("fetch", (event) => {
+  if (isCacheable(event.request)) {
+    event.respondWith(cacheFirstWithRefresh(event.request));
+  }
+});
