@@ -1,7 +1,8 @@
 import fit2labradar from "./fit2labradar";
-import csv2labradar from "./csv2labradar";
+import csv2labradar from "./csv2labradar2";
 //import xls2labradar from "./xls2labradar";
 import xls2labradar from "./xls2labradar_v2";
+import download from "./downloadhandler";
 import { showError } from "./messages";
 
 async function fileSystemHandleToArrayBuffer(fileHandle: FileSystemFileHandle):Promise<ArrayBuffer> {
@@ -44,7 +45,8 @@ export async function handleFilesPwa(files:readonly FileSystemFileHandle[] | Fil
             const result_f:Promise<string> = fit2labradar(fileData, file.name)
             result_f.then((value) => {console.log("[handlefiles2]: success");localstoragecount += 1;},(error) => {showError(error)});
         } else if (/\.csv$/g.test(file.name)) {
-            const result_c:Promise<string> = csv2labradar(fileData, file.name);
+            const files:File[] = []
+            const result_c:Promise<string|boolean> = csv2labradar(fileData, file.name).then((file) => {files.push(file)}).then(() => download(files));
             result_c.then((value) => {console.log("[handlefiles2]: success");localstoragecount += 1},(error) => {showError(error)});
         } else if (/\.xlsx?$/g.test(file.name)) {
             const result_x:Promise<string> = xls2labradar(fileData, file.name);

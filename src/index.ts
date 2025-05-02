@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
   navigator.setAppBadge(Number(localStorage.total))
 });
 
-//registetr Eventlisteners
+//register Eventlisteners
 (document.querySelectorAll('#fit2labradar, #csv2labradar, #xls2labradar')).forEach((element) => {
   element.addEventListener("change",(event) => {
     handleFilesPwa((event.target as HTMLInputElement).files)
