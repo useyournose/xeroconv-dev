@@ -4,7 +4,7 @@ import downloadFiles  from "./downloadFiles";
 
 export default function download(files:File[]):Promise<boolean|string> {
   return new Promise((resolve,reject) => {
-    if (!navigator.canShare && navigator.canShare({files})) {
+    if (navigator.canShare && navigator.canShare({files})) {
       console.log('Sharing files is supported');
       const target = document.getElementById('modal-download');
       const shareButton = document.getElementById('dl-share');
