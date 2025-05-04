@@ -47,9 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if ('setConsumer' in window.launchQueue) {
       window.launchQueue.setConsumer((launchParams) => {
           console.log(launchParams.files)
-          if (launchParams.files.length > 0) {
-            handleFilesPwa(launchParams.files);
-          }
+          //if (launchParams.files.length > 0) {
+            handleFilesPwa(launchParams.files)
+            .finally(window.close)
+          //}
       });
     }
   } else {
@@ -82,7 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
     installButton.setAttribute("hidden", "");
   }
 
-
   /*total
   failed
   */
@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
 (document.querySelectorAll('#fit2labradar, #csv2labradar, #xls2labradar')).forEach((element) => {
   element.addEventListener("change",(event) => {
     handleFilesPwa((event.target as HTMLInputElement).files)
+    .finally(() => {(event.target as HTMLInputElement).value = ''})
   }, false);
 });
 

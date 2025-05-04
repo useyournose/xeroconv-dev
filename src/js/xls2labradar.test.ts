@@ -1,6 +1,6 @@
 import { test, expect, spyOn, afterEach, mock, beforeEach } from "bun:test";
 import xls2labradar from './xls2labradar_v2';
-import * as download from './download';
+import * as download from './downloadFiles';
 import * as csv2labradar from './csv2labradar';
 
 import * as fs from 'fs';

@@ -1,12 +1,10 @@
 import { Stream, Decoder } from "@garmin/fitsdk";
-import download from "./download";
-//import { showError, showSuccess } from "./messages";
 import getLabradartemplate from "./getLabradarTemplate";
 import StandardDeviation from "./StandardDeviation";
 import get_ke from "./get_ke";
 import getdatestring from "./getdatestring";
 
-export default function fit2labradar(fileData:ArrayBuffer,ofilename:string):Promise<string> {
+export default function fit2labradar(fileData:ArrayBuffer,ofilename:string):Promise<File> {
   return new Promise((resolve,reject) => {
     const start = Date.now();
     const filename = ofilename.replace(/\.fit$/, '-xeroconv.csv');
@@ -16,8 +14,7 @@ export default function fit2labradar(fileData:ArrayBuffer,ofilename:string):Prom
     console.log("[fit2labradar]: " + ofilename + " checkIntegrity: " + decoder.checkIntegrity());
     if (!(decoder.isFIT() && decoder.checkIntegrity())) {
       console.error("[fit2labradar]: " + ofilename + ' - not a working fit file.');
-      reject('Error: ' + ofilename + ' - not a working fit file.');
-      return
+      return reject('Error: ' + ofilename + ' - not a working fit file.');
     }
     const unit_velocity:string = "m/s";
     const unit_distance = "m";
@@ -36,14 +33,12 @@ export default function fit2labradar(fileData:ArrayBuffer,ofilename:string):Prom
     });
     if (errors.length > 0) {
       console.error("[fit2labradar]: " + ofilename + " - Error found during reading.");
-      reject("Error" + ofilename + " - Error found during reading.");
-      return
+      return reject("Error" + ofilename + " - Error found during reading.");
     }
     if (!(Object.hasOwn(messages,'chronoShotSessionMesgs') && Object.hasOwn(messages,'chronoShotDataMesgs') && Object.hasOwn(messages,'deviceInfoMesgs'))) {
       //showError("Error: " + ofilename + ' does not contain shot sessions file.');
       console.error("[fit2labradar]: " + ofilename + ' does not contain shot sessions.');
-      reject('Error: ' + ofilename + ' does not contain shot sessions.');
-      return
+      return reject('Error: ' + ofilename + ' does not contain shot sessions.');
     }
     try {
       const DeviceData = messages.deviceInfoMesgs[0]
@@ -67,21 +62,27 @@ export default function fit2labradar(fileData:ArrayBuffer,ofilename:string):Prom
       messages.chronoShotDataMesgs.forEach(function (item,index) {
         const [datestring,timestring] = getdatestring(item.timestamp);
         if (datestring == 'Invalid Date' || datestring == "01-01-1990" ) {
-          reject("Date " + item.timestamp + " does not parse. Ping the dev on github.");
+          return reject("Date " + item.timestamp + " does not parse. Ping the dev on github.");
         }
         stream+=item.shotNum.toString().padStart(4, '0') + ";" + item.shotSpeed +";" + get_ke(item.shotSpeed,SessionData.grainWeight) + ";"+ SessionData.grainWeight + ";" + datestring +";" + timestring  + ";\n";
       })
       console.log("[fit2labradar]: parsed " + ofilename + " in " + (Date.now() - start) + " milliseconds." );
-      const downloadstatus:Promise<string|boolean> = download(stream,filename)
-      downloadstatus
-      .then((value) => {resolve(value.toString())})
-      .catch((error) => {console.error(error); reject(error as string); return;})
+
+      const blob = new Blob([stream], {type: "text/plain;charset=utf-8"} )
+      const file = new File([blob], filename, {type: "text/plain"})
+      return resolve(file)
+
+
+      //const downloadstatus:Promise<string|boolean> = download(stream,filename)
+      //downloadstatus
+      //.then((value) => {resolve(value.toString())})
+      //.catch((error) => {console.error(error); reject(error as string); return;})
     } catch(err) {
       console.error(err);
       if (Object.hasOwn(err,'message')) {
-        reject(err.message)
+        return reject(err.message)
       } else {
-        reject(err);
+        return reject(err);
       }
     }
   })

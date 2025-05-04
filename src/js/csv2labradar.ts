@@ -1,11 +1,10 @@
 import Papa, { ParseResult } from "papaparse";
-import download from "./download";
 import getLabradartemplate from "./getLabradarTemplate";
 import nnf from "./nnf";
 import getdatestring from "./getdatestring";
 
 
-export default function csv2labradar(fileData:ArrayBuffer|string,ofilename:string):Promise<string> {
+export default function csv2labradar(fileData:ArrayBuffer|string,ofilename:string):Promise<File> {
   return new Promise((resolve,reject) => {
     const start = Date.now();
     const dec = new TextDecoder("utf-8")
@@ -20,8 +19,7 @@ export default function csv2labradar(fileData:ArrayBuffer|string,ofilename:strin
     }
     if (sourceparts.length == 1){
       console.error("[csv2labradar]: " + ofilename + ' not a working csv file.');
-      reject("Error: " + ofilename + ' is not a working csv file.');
-      return;
+      return reject("Error: " + ofilename + ' is not a working csv file.');
     }
     try {
       const sourceparts0:string[] = sourceparts[0].split('\n')
@@ -55,8 +53,7 @@ export default function csv2labradar(fileData:ArrayBuffer|string,ofilename:strin
         const [datestring,hourstring] = getdatestring(dt.data[0][1]);
 
         if (datestring == 'Invalid Date' || datestring == "01-01-1990" ) {
-          reject("Date " + dt.data[0][1] + " does not parse. Ping the dev on github.");
-          return
+          return reject("Date " + dt.data[0][1] + " does not parse. Ping the dev on github.");
         }
         
         if (ofilename.includes(datestring) || ofilename.includes((datestring.split('-').reverse().join('-'))) ) {
@@ -96,17 +93,17 @@ export default function csv2labradar(fileData:ArrayBuffer|string,ofilename:strin
             stream+=item[0].toString().padStart(4, '0') + ";" + nnf(item[1]) +";" + nnf(item[3]) + ";" + nnf(stats.data[4][1]) + ";" + datestring +";" + item[5]  + ";\n";
         })
         console.log("[csv2labradar]: parsed " + title + " in " + (Date.now() - start) + " milliseconds.")
-        const downloadstatus:Promise<string|boolean> = download(stream,filename)
-        downloadstatus
-        .then((value) => {resolve(value.toString())})
-        .catch((error) => {console.error(error); reject(error as string); return;})
+        
+        const blob = new Blob([stream], {type: "text/plain;charset=utf-8"} )
+        const file = new File([blob], filename, {type: "text/plain"})
+        return resolve(file)
       }
     } catch(err) {
       console.error("[csv2labradar]: " + err);
       if (Object.hasOwn(err,'message')) {
-        reject(err.message)
+        return reject(err.message)
       } else {
-        reject(err);
+        return reject(err);
       }
     }
   }
