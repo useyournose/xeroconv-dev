@@ -36,6 +36,6 @@ async function cacheFirstWithRefresh(request:Request) {
 
 self.addEventListener("fetch", async (event) => {
   if (isCacheable(event.request)) {
-    event.respondWith(await cacheFirstWithRefresh(event.request));
+    event.respondWith(cacheFirstWithRefresh(event.request));
   }
 });
