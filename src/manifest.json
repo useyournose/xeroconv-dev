@@ -34,7 +34,7 @@
       }
   ],
   "share_target": {
-    "action": ".",
+    "action": "/convert",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
@@ -43,24 +43,14 @@
       "url": "link",
       "files": [
         {
-          "name": "shotview csv",
+          "name": "xerofiles",
           "accept": [
             "text/csv",
-            ".csv"
-          ]
-        },
-        {
-          "name": "shotview xls",
-          "accept": [
+            ".csv",
             "application/vnd.ms-excel",
             ".xls",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            ".xlsx"
-          ]
-        },
-        {
-          "name": "garmin fit",
-          "accept": [
+            ".xlsx",
             "application/vnd.ant.fit",
             ".fit"
           ]

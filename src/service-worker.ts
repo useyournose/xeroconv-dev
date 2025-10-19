@@ -1,4 +1,5 @@
 import {manifest, version} from '@parcel/service-worker';
+import { handleFilesPwa } from './js/handlefiles-pwa';
 declare var self: ServiceWorkerGlobalScope;
 
 function isCacheable(request:Request) {
@@ -37,5 +38,26 @@ async function cacheFirstWithRefresh(request:Request) {
 self.addEventListener("fetch", (event) => {
   if (isCacheable(event.request)) {
     event.respondWith(cacheFirstWithRefresh(event.request));
+  }
+});
+
+self.addEventListener('fetch', (fetchEvent) => {
+  if (fetchEvent.request.url.endsWith('/receive-files/') && fetchEvent.request.method === 'POST') {
+    return fetchEvent.respondWith(
+      (async () => {
+        const formData = await fetchEvent.request.formData();
+        const title = formData.get("title");
+        const text = formData.get("text");
+        const url = formData.get("url");
+        const files = formData.getAll("xerofiles") as File[];
+        if (files && files.length > 0) {
+          handleFilesPwa(files)
+        }    
+        //const keys = await caches.keys();
+        //const mediaCache = await caches.open(keys.filter((key) => key.startsWith('media'))[0]);
+        //await mediaCache.put('shared-xerofile', new Response(image));
+        return Response.redirect('./?share-target', 303);
+      })(),
+    );
   }
 });

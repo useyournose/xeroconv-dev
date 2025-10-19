@@ -28,7 +28,7 @@ function fileToArrayBuffer(file:File):Promise<ArrayBuffer> {
 
 
 
-export async function handleFilesPwa(files:readonly FileSystemFileHandle[] | FileList):Promise<boolean> {
+export async function handleFilesPwa(files:readonly FileSystemFileHandle[] | FileList | File[] ):Promise<boolean> {
 return new Promise(async (resolve,reject) => {
     var localstoragecount = Number(localStorage.total) || 0
     var outfiles:File[] = []
