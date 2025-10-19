@@ -4,6 +4,26 @@ import {HistogramDatasetBinned, RawDataset, BinnedDataset, BinningResult} from "
 
 type HistogramData = number[];
 
+function mean(arr: number[]): number {
+  return arr.reduce((a, b) => a + b, 0) / arr.length;
+}
+function stddev(arr: number[], mu: number): number {
+  return Math.sqrt(arr.reduce((s, x) => s + (x - mu) ** 2, 0) / arr.length);
+}
+function normalPDF(x: number, mu: number, sigma: number): number {
+  return (1 / (sigma * Math.sqrt(2 * Math.PI))) *
+         Math.exp(-0.5 * ((x - mu) / sigma) ** 2);
+}
+function gaussianKernel(u: number): number {
+  return (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * u * u);
+}
+function kde(xs: number[], data: number[], bandwidth: number): number[] {
+  return xs.map(x =>
+    data.reduce((sum, xi) => sum + gaussianKernel((x - xi) / bandwidth), 0) /
+    (data.length * bandwidth)
+  );
+}
+
 function binData(data: HistogramData, binSize: number): { labels: string[]; counts: number[] } {
   const min = Math.min(...data);
   const max = Math.max(...data);
@@ -175,7 +195,7 @@ export function renderHistogramOverlay(
   if (!el) return null;
 
   // if re-rendering, destroy existing Chart instance bound to canvas
-  // @ts-ignore
+  // @ts-ignore 
   if ((el as any)._chart) { /* eslint-disable-line @typescript-eslint/no-explicit-any */
     // @ts-ignore
     (el as any)._chart.destroy();
@@ -213,4 +233,112 @@ export function renderHistogramOverlay(
   // @ts-ignore
   (el as any)._chart = chart;
   return chart;
+}
+
+export function renderKDEOverlay(canvasId:string, RawData:RawDataset[]): Chart | null {
+
+  const el = document.getElementById(canvasId) as HTMLCanvasElement | null;
+  if (!el) return null;
+
+  // if re-rendering, destroy existing Chart instance bound to canvas
+  // @ts-ignore 
+  if ((el as any)._chart) { /* eslint-disable-line @typescript-eslint/no-explicit-any */
+    // @ts-ignore
+    (el as any)._chart.destroy();
+  }
+
+    // Gemeinsame X-Achse für Dichten
+  const globalMin = Math.min(...RawData.flatMap(({values}) => values));
+  const globalMax = Math.max(...RawData.flatMap(({values}) => values));
+  const xValues: number[] = [];
+  for (let x = globalMin; x <= globalMax; x += 0.2) xValues.push(x);
+
+  // Datasets sammeln
+  const datasets: any[] = [];
+
+  RawData.forEach((s, idx) => {
+    const mu = mean(s.values);
+    const sigma = stddev(s.values, mu);
+
+    // Histogramm
+    const binCount = 10;
+    const binWidth = (globalMax - globalMin) / binCount;
+    const bins = Array(binCount).fill(0);
+    s.values.forEach(v => {
+      const i = Math.min(Math.floor((v - globalMin) / binWidth), binCount - 1);
+      bins[i]++;
+    });
+    const binCenters = bins.map((_, i) => globalMin + (i + 0.5) * binWidth);
+
+    // Normalverteilung
+    const normalValues = xValues.map(x => normalPDF(x, mu, sigma));
+
+    // KDE
+    const h = 1.06 * sigma * Math.pow(s.values.length, -1 / 5);
+    const kdeValues = kde(xValues, s.values, h);
+
+    // Histogramm-Dataset
+    /*datasets.push({
+      type: "bar",
+      label: `${s.label} Histogramm`,
+      data: bins,
+      backgroundColor: s.color,
+      xAxisID: "xBins" + idx,
+      yAxisID: "y"
+    });*/
+
+    // Normalverteilung
+    /*datasets.push({
+      type: "line",
+      label: `${s.label} Normal`,
+      data: normalValues.map(v => v * s.values.length * binWidth),
+      borderColor: s.color,
+      fill: false,
+      tension: 0.2,
+      xAxisID: "xDensity",
+      yAxisID: "y"
+    });*/
+
+    // KDE
+    datasets.push({
+      type: "line",
+      label: `${s.label} KDE`,
+      data: kdeValues.map(v => v * s.values.length * binWidth),
+      borderColor: s.color,
+      fill: false,
+      tension: 0.2,
+      xAxisID: "xDensity",
+      yAxisID: "y"
+    });
+  });
+
+  // Chart Config
+    const chart = new Chart(el,{
+      type: "line",
+      data: {
+        labels: xValues.map(v => v.toFixed(1)), // für Dichten
+        datasets
+      },
+      options: {
+        responsive: true,
+        scales: {
+          xDensity: {
+            type: "linear",
+            position: "bottom",
+            min: globalMin,
+            max: globalMax,
+            title: { display: true, text: "Speed" }
+          },
+          y: {
+            title: { display: true, text: "Density" }
+          }
+        }
+      }
+    });
+
+  // store reference for later cleanup
+  // @ts-ignore
+  (el as any)._chart = chart;
+  return chart;
+
 }
