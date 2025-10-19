@@ -33,61 +33,6 @@
       "purpose": "any maskable"
       }
   ],
-  "share_target": {
-    "action": ".",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "title": "name",
-      "text": "description",
-      "url": "link",
-      "files": [
-        {
-          "name": "shotview csv",
-          "accept": [
-            "text/csv",
-            ".csv"
-          ]
-        },
-        {
-          "name": "shotview xls",
-          "accept": [
-            "application/vnd.ms-excel",
-            ".xls",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            ".xlsx"
-          ]
-        },
-        {
-          "name": "garmin fit",
-          "accept": [
-            "application/vnd.ant.fit",
-            ".fit"
-          ]
-        }
-      ]
-    }
-  },
-  "file_handlers": [
-    {
-      "action": ".",
-      "accept": {
-        "text/csv": [
-          ".csv"
-        ],
-        "application/vnd.ms-excel" : [
-          ".xls"
-        ],
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
-          ".xlsx"
-        ],
-        "application/vnd.ant.fit": [
-          ".fit"
-        ]
-      },
-      "launch_type": "single-client"
-    }
-  ],
   "launch_handler": {
     "client_mode": ["focus-existing", "auto"]
   },

@@ -1,5 +1,5 @@
 import {expect, test} from "bun:test";
-import getdatestring from '../js/getdatestring';
+import getdatestring, {gettimestamp} from '../js/getdatestring';
 
 test('convert western time, capital month', () => {
     const probe = "JULI 02,2024 17:08";
@@ -98,3 +98,16 @@ test('convert fit stamp', () => {
 });
 
 
+test('gettimestamp eu', () => {
+    const hourstring = "13:55:25"
+    const timestamp:number = 1758708000
+    const expected = 1758722125
+    expect(gettimestamp(timestamp, hourstring)).toBe(expected)
+})
+
+test('gettimestamp us', () => {
+    const hourstring = "6:55:25 PM"
+    const timestamp:number = 1758708000
+    const expected = 1758740125
+    expect(gettimestamp(timestamp, hourstring)).toBe(expected)
+})

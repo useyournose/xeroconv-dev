@@ -1,9 +1,15 @@
 import fit2labradar from "./fit2labradar";
-import csv2labradar from "./csv2labradar";
+import fit2json from "./fit2json"
+//import csv2labradar from "./csv2db";
 //import xls2labradar from "./xls2labradar";
-import xls2labradar from "./xls2labradar_v2";
+import xls2json from "./xls2json";
 import download from "./downloadhandler";
 import { showError } from "./messages";
+import csv2json from "./csv2json";
+import { AddSession } from "./services/importService"; 
+import { json2Labradar } from "./json2labradar";
+import { renderTable } from "./renderTable";
+import { ShotSession } from "./_types";
 
 async function fileSystemHandleToArrayBuffer(fileHandle: FileSystemFileHandle):Promise<ArrayBuffer> {
   // Get the file from the file handle
@@ -26,15 +32,13 @@ function fileToArrayBuffer(file:File):Promise<ArrayBuffer> {
   })
 }
 
-
-
-export async function handleFilesPwa(files:readonly FileSystemFileHandle[] | FileList):Promise<boolean> {
-return new Promise(async (resolve,reject) => {
+export async function handleFiles(files:readonly FileSystemFileHandle[] | FileList | File[], indexedDBavailable:boolean ):Promise<boolean> {
+  return new Promise(async (resolve,reject) => {
     var localstoragecount = Number(localStorage.total) || 0
     var outfiles:File[] = []
     var outpromises:Promise<boolean|string|number>[] = []
 
-    async function handleFile (file:FileSystemHandle | File):Promise<boolean> {
+    async function handleFile (file:FileSystemHandle | File):Promise<boolean > {
         var fileData = new ArrayBuffer()
         if (file instanceof FileSystemFileHandle) {
             fileData = await fileSystemHandleToArrayBuffer(file)
@@ -44,11 +48,30 @@ return new Promise(async (resolve,reject) => {
             return Promise.reject(false)
         }
         if (/\.fit$/g.test(file.name)) {
-            return fit2labradar(fileData, file.name).then((file) => {outfiles.push(file); return Promise.resolve(true)})
+            return fit2json(fileData, file.name)
+                .then(async (Session) => {
+                    if (indexedDBavailable) {const fid = await AddSession(Session as ShotSession)}
+                    return json2Labradar(Session as ShotSession)
+                    }
+                )                
+                .then((blob) => {outfiles.push(blob);return Promise.resolve(true)})
         } else if (/\.csv$/g.test(file.name)) {
-            return csv2labradar(fileData, file.name).then((file) => {outfiles.push(file); return Promise.resolve(true)})
+            return csv2json(fileData, file.name)
+                .then(async (Session) => {
+                    if (indexedDBavailable) {const fid = await AddSession(Session as ShotSession)}
+                    return json2Labradar(Session as ShotSession)
+                    }
+                )                
+                .then((blob) => {outfiles.push(blob);return Promise.resolve(true)})
         } else if (/\.xlsx?$/g.test(file.name)) {
-            return xls2labradar(fileData, file.name).then((xlsfiles) => {outfiles = outfiles.concat(xlsfiles);return Promise.resolve(true)})
+            return xls2json(fileData, file.name)
+                .then(sessions => Promise.all(sessions.map(async session => {
+                    if (indexedDBavailable) {const fid = await AddSession(session as ShotSession)}
+                    return json2Labradar(session)
+                    }
+                )))
+                .then(blobs => outfiles = [...outfiles,...blobs])
+                .then(() => {return Promise.resolve(true)})
         } else {
             console.error('[handlefiles]: what is ' + file.name + ' doing here?');
             return Promise.reject(false)
@@ -74,10 +97,12 @@ return new Promise(async (resolve,reject) => {
             localstoragecount += outfiles.length
             localStorage.total = localstoragecount
             outpromises.length=0;
+            if (indexedDBavailable){renderTable();}
             console.log("total converted Files: ", localstoragecount)
             return resolve(true)
         })
         .catch((err) => {
+            console.warn(err)
             return reject(false)
         })
   })

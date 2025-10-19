@@ -1,10 +1,20 @@
-//import handleFiles from "./js/handleFiles";
+import db from "./js/db";
+import {handleFiles} from "./js/handleFiles-json";
 import { openModal, closeModal, closeAllModals } from "./js/modals";
+import {autoBinDatasets, renderHistogram, renderHistogramOverlay } from "./js/histogram";
+import {renderTable} from "./js/renderTable"
+import { GetCheckedShots, MarkFileAsChecked, MarkFileAsUnchecked } from "./js/services/queryService";
 import { BeforeInstallPromptEvent, LaunchParams } from "./js/_types";
-import { handleFilesPwa } from "./js/handlefiles-pwa";
 
 document.addEventListener('DOMContentLoaded', () => {
+  const feature_IndexedDB = 'indexedDB' in window;
 
+  if (feature_IndexedDB) {
+    //wipe indexedDB
+    (db.delete().then(async () => await db.open()));
+    (document.getElementById('NavAnalyse')).classList.remove('is-hidden');
+  }
+  
   // Add a click event on buttons to open a specific modal
   (document.querySelectorAll('.js-modal-trigger') || []).forEach(($trigger) => {
     const modal = $trigger.dataset.target;
@@ -41,22 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // handle launch queue when started via file-handler
-  if ('launchQueue' in window) {
-    console.log('File Handling API is supported!');
-      if ('setConsumer' in window.launchQueue) {
-      window.launchQueue.setConsumer((launchParams) => {
-          console.log(launchParams.files)
-          //if (launchParams.files.length > 0) {
-            handleFilesPwa(launchParams.files)
-            .finally(window.close)
-          //}
-      });
-    }
-  } else {
-      console.error('File Handling API is not supported!');
-  }
-
   //install button handling https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Trigger_install_prompt
   let installPrompt:BeforeInstallPromptEvent = null;
   const installButton = document.querySelector("#install");
@@ -83,23 +77,61 @@ document.addEventListener('DOMContentLoaded', () => {
     installButton.setAttribute("hidden", "");
   }
 
-  /*total
-  failed
-  */
-  if (localStorage.total) {
-    console.log("total process: ", localStorage.total)
-  } else {
-    console.log("no storage there, creating it.");
-    localStorage.total = "0"
-  }
-  navigator.setAppBadge(Number(localStorage.total))
+
+  (document.querySelectorAll('.js-page-trigger') || []).forEach( el => {
+    el.addEventListener('click', () => {
+      const target = el.dataset.target;
+      const $target = document.getElementById(target);
+      (document.querySelectorAll('.js-page-trigger') || []).forEach( elem =>  {
+        elem.classList.remove("is-active")
+        const target = elem.dataset.target;
+        const $target = document.getElementById(target);
+        $target.classList.add("is-hidden")
+      })
+      el.classList.toggle('is-active');
+      $target.classList.remove("is-hidden");
+    });
+  });
+
+
+  //register Eventlisteners
+  (document.getElementById('xero2labradar') as HTMLFormElement)
+  .addEventListener("change",(event) => {
+      handleFiles((event.target as HTMLInputElement).files, feature_IndexedDB)
+      .finally(() => {(event.target as HTMLInputElement).value = ''})
+  }, false);
+
+  renderTable;
+
+  (document.getElementById('table'))
+  .addEventListener('change', (e) => {
+    const target = e.target as HTMLElement | null;
+    const targetunits = (document.getElementById('units-imperial') as HTMLFormElement).checked
+    if (!target) return;
+    if (target instanceof HTMLInputElement && target.type === 'checkbox') {
+      const checked = target.checked;
+      let check
+      if (checked) {
+        check = MarkFileAsChecked( Number(target.parentElement.parentElement.dataset.fileid))
+      } else {
+        check = MarkFileAsUnchecked( Number(target.parentElement.parentElement.dataset.fileid))
+      }
+      check
+      .then(() => renderTable)
+      .then(() => GetCheckedShots(targetunits))
+      .then( shots => autoBinDatasets(shots))
+      .then( result => renderHistogramOverlay('histogramCanvas', result.labels, result.datasets))    
+    }
+  })
+
+  document.getElementById('units-radio').addEventListener('change', () => {
+    const targetunits = (document.getElementById('units-imperial') as HTMLFormElement).checked
+    GetCheckedShots(targetunits)
+    .then( shots => autoBinDatasets(shots))
+    .then( result => renderHistogramOverlay('histogramCanvas', result.labels, result.datasets))
+  });
+
 });
 
-//register Eventlisteners
-(document.querySelectorAll('#fit2labradar, #csv2labradar, #xls2labradar')).forEach((element) => {
-  element.addEventListener("change",(event) => {
-    handleFilesPwa((event.target as HTMLInputElement).files)
-    .finally(() => {(event.target as HTMLInputElement).value = ''})
-  }, false);
-});
+
 
