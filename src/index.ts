@@ -4,7 +4,7 @@ import { openModal, closeModal, closeAllModals } from "./js/modals";
 import {autoBinDatasets, renderHistogram, renderHistogramOverlay } from "./js/histogram";
 import {renderTable} from "./js/renderTable"
 import { GetCheckedShots, MarkFileAsChecked, MarkFileAsUnchecked } from "./js/services/queryService";
-import { BeforeInstallPromptEvent, LaunchParams } from "./js/_types";
+//import { BeforeInstallPromptEvent, LaunchParams } from "./js/_types";
 
 document.addEventListener('DOMContentLoaded', () => {
   const feature_IndexedDB = 'indexedDB' in window;
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   //install button handling https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Trigger_install_prompt
-  let installPrompt:BeforeInstallPromptEvent = null;
+  let installPrompt :BeforeInstallPromptEvent = null;
   const installButton = document.querySelector("#install");
 
   window.addEventListener("beforeinstallprompt", (event) => {

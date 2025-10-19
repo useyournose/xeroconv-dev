@@ -1,6 +1,6 @@
 //found  here https://github.com/christianliebel/paint/blob/6b4703cabfb818683c348c212651923a282d3aab/types/static.d.ts#L8
 
-type UserChoice = Promise<{
+/*type UserChoice = Promise<{
   outcome: 'accepted' | 'dismissed';
   platform: string;
 }>;
@@ -32,7 +32,7 @@ declare global {
         appinstalled: Event;
     }
 }
-
+*/
 // units
 export type unitsystems = 'metric'|'imperial'
 
