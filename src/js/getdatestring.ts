@@ -22,7 +22,23 @@ function monthsToLower(months:string[]):string[] {
     return months.map(name => name.toLowerCase()) ;
 }
 
-export default function getdatestring(datestring:string):string[] {
+export function gettimestamp(timestamp: number, hourstring: string) {
+    const STRING_US = 'h:mm:ss A'
+    const STRING_EU = 'HH:mm:ss'
+    const day = dayjs.unix(timestamp).startOf('day')
+    const time = dayjs(hourstring, [STRING_US, STRING_EU])
+
+    return (
+        day
+        .set("hour", time.hour())
+        .set("minute", time.minute())
+        .set("second", time.second())
+        .unix()
+    )
+
+}
+
+export default function getdatestring(datestring:string):[string,string,number] {
     const culturearray = ["tr","sv","es","ro","pl","it","de","fr","nl","da","en"]
     const STRING_US = 'MMMM D[,]YYYY [at] h:mm A'
     const STRING_EU = 'MMMM DD[,]YYYY HH:mm'
@@ -116,6 +132,7 @@ export default function getdatestring(datestring:string):string[] {
     dayjs.locale('en');
     return [
         datedate.format("DD-MM-YYYY"),
-        datedate.format("HH:mm:ss")
+        datedate.format("HH:mm:ss"),
+        datedate.unix()
     ]
 }
