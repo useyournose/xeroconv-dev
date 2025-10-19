@@ -66,17 +66,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!installPrompt) {
       return;
     }
-    const result = await installPrompt.prompt();
+    installPrompt.prompt();
+    installPrompt.userChoice
+    .then( result => {
+      if (result.outcome == 'dismissed') {
+        console.log(`Install prompt was: ${result}`);
+      } else {
+        console.log(`Install prompt was: ${result}`);
+      }
+      disableInAppInstallPrompt();
+    })
+    /*const result = await installPrompt.prompt();
     console.log(`Install prompt was: ${result.outcome}`);
     disableInAppInstallPrompt();
-    installPrompt = null;
+    installPrompt = null;*/
   });
   
   function disableInAppInstallPrompt() {
     installPrompt = null;
     installButton.setAttribute("hidden", "");
   }
-
 
   (document.querySelectorAll('.js-page-trigger') || []).forEach( el => {
     el.addEventListener('click', () => {
