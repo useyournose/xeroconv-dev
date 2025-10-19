@@ -1,6 +1,6 @@
 {
   "name": "xeroconv",
-  "version": "1.0.20251019.01",
+  "version": "1.0.20251019.02",
   "description": "Convert Garmin Xero and Garmin Shotview files",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "directories": {

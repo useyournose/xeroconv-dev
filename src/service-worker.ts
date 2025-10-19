@@ -34,7 +34,7 @@ async function cacheFirstWithRefresh(request:Request) {
   return (await caches.match(request)) || (await fetchResponsePromise);
 }
 
-self.addEventListener("fetch", (event) => {
+self.addEventListener("fetch", async (event) => {
   if (isCacheable(event.request)) {
     event.respondWith(cacheFirstWithRefresh(event.request));
   }

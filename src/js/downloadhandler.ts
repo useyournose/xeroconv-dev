@@ -15,7 +15,7 @@ export default function download(files:File[]):Promise<boolean|string> {
   var sharing = false
 
   return new Promise(async (resolve,reject) => {
-    if (navigator.canShare && navigator.canShare({files}) && sharing === false) {
+    /*if (navigator.canShare && navigator.canShare({files}) && sharing === false) {
       console.log('Sharing files is supported');
       const target = document.getElementById('modal-download');
       const shareButton = document.getElementById('dl-share');
@@ -56,9 +56,9 @@ export default function download(files:File[]):Promise<boolean|string> {
 
       openModal(target);
     } else {
-      console.info('Sharing files is not supported');
+      console.info('Sharing files is not supported');*/
       //inspired from https://stackoverflow.com/a/18197341
       return downloadFiles(files).then(() => {cleanfiles;true})
-    }
+    //}
   })
 }

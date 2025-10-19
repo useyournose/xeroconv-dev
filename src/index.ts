@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     event.preventDefault();
     installPrompt = event;
     installButton.removeAttribute("hidden");
-    return false;
+    //return false;
   });
   
   installButton.addEventListener("click", async () => {
@@ -67,15 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     installPrompt.prompt();
-    installPrompt.userChoice
-    .then( result => {
-      if (result.outcome == 'dismissed') {
-        console.log(`Install prompt was: ${result}`);
-      } else {
-        console.log(`Install prompt was: ${result}`);
-      }
-      disableInAppInstallPrompt();
-    })
+    const { outcome } = await installPrompt.userChoice;
+    console.log(`User response to the install prompt: ${outcome}`);
+    disableInAppInstallPrompt();
     /*const result = await installPrompt.prompt();
     console.log(`Install prompt was: ${result.outcome}`);
     disableInAppInstallPrompt();
