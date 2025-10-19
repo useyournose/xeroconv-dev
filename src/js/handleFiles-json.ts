@@ -80,8 +80,8 @@ export async function handleFiles(files:readonly FileSystemFileHandle[] | FileLi
     }
 
     await Promise.allSettled(outpromises)
-        .then((counter) => {
-        //    console.log(counter)
+        .then((values) => {
+            values.filter((value) => value.status=='rejected').map((value) => showError(value.reason));
             if (outfiles.length === 0) {
                 console.log("nothing here")
             }

@@ -1,7 +1,7 @@
 import db from "./js/db";
 import {handleFiles} from "./js/handleFiles-json";
 import { openModal, closeModal, closeAllModals } from "./js/modals";
-import {autoBinDatasets, renderHistogram, renderHistogramOverlay } from "./js/histogram";
+import {autoBinDatasets, renderHistogram, renderHistogramOverlay, renderKDEOverlay } from "./js/histogram";
 import {renderTable} from "./js/renderTable"
 import { GetCheckedShots, MarkFileAsChecked, MarkFileAsUnchecked } from "./js/services/queryService";
 //import { BeforeInstallPromptEvent, LaunchParams } from "./js/_types";
@@ -122,16 +122,18 @@ document.addEventListener('DOMContentLoaded', () => {
       check
       .then(() => renderTable)
       .then(() => GetCheckedShots(targetunits))
-      .then( shots => autoBinDatasets(shots))
-      .then( result => renderHistogramOverlay('histogramCanvas', result.labels, result.datasets))    
+      //.then( shots => autoBinDatasets(shots))
+      //.then( result => renderHistogramOverlay('histogramCanvas', result.labels, result.datasets))
+      .then(shots => renderKDEOverlay('histogramCanvas', shots))
     }
   })
 
   document.getElementById('units-radio').addEventListener('change', () => {
     const targetunits = (document.getElementById('units-imperial') as HTMLFormElement).checked
     GetCheckedShots(targetunits)
-    .then( shots => autoBinDatasets(shots))
-    .then( result => renderHistogramOverlay('histogramCanvas', result.labels, result.datasets))
+    .then(shots => renderKDEOverlay('histogramCanvas', shots))
+    //.then( shots => autoBinDatasets(shots))
+    //.then( result => renderHistogramOverlay('histogramCanvas', result.labels, result.datasets))
   });
 
 });
