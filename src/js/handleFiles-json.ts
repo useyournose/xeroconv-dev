@@ -1,7 +1,4 @@
-import fit2labradar from "./fit2labradar";
 import fit2json from "./fit2json"
-//import csv2labradar from "./csv2db";
-//import xls2labradar from "./xls2labradar";
 import xls2json from "./xls2json";
 import download from "./downloadhandler";
 import { showError } from "./messages";
@@ -103,6 +100,7 @@ export async function handleFiles(files:readonly FileSystemFileHandle[] | FileLi
         })
         .catch((err) => {
             console.warn(err)
+            showError(err);
             return reject(false)
         })
   })
