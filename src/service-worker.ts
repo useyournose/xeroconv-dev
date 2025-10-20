@@ -37,12 +37,13 @@ async function cacheFirstWithRefresh(request:Request) {
 
 // Try network first and fallback on cache
 async function networkRevalidateAndCache(ev:FetchEvent) {
-  if (!(ev.request.url.startsWith('http'))) return;
   try {
     const fetchResponse = await fetch(ev.request);
     if (fetchResponse.ok) {
       const cache = await caches.open(version);
-      await cache.put(ev.request, fetchResponse.clone());
+      if (ev.request.url.startsWith('http')) {
+        await cache.put(ev.request, fetchResponse.clone());
+      }
       return fetchResponse;
     } else {
       const cacheResponse = await caches.match(ev.request);
