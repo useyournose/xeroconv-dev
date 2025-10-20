@@ -52,9 +52,12 @@ async function networkRevalidateAndCache(ev:FetchEvent) {
   }
 }
 
-self.addEventListener("fetch", (ev) => {
-    ev.respondWith(networkRevalidateAndCache(ev));
-});
+self.addEventListener("fetch", async (ev) => {
+  try {
+    ev.respondWith(await networkRevalidateAndCache(ev));
+  } catch (err) {
+    console.log("Could not return cache or fetch NF", err);
+}});
 
 /*self.addEventListener("fetch", async (event) => {
   if (isCacheable(event.request)) {
