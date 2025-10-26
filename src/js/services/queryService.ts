@@ -8,8 +8,13 @@ export async function GetFiles():Promise<TFileInfoEntry[]>{
     const files:TFileInfoEntry[] = await db.files.toArray()
     const result = await Promise.all(files.map(async file => {
         const stats = await db.stats.where('fileid').equals(file.id).first()
-        file.timestamp = stats.timestamp
-        file.shotcount = stats.shots_total
+        file.stats = stats
+
+        if (file.stats.speed_es != file.stats.speed_max - file.stats.speed_min) {
+            console.log("spread " + file.stats.speed_es.toString() + " not matching, updating.")
+            file.stats.speed_es = Math.round((file.stats.speed_max - file.stats.speed_min) * 1000) / 1000
+        }
+
     }))
     return files
 

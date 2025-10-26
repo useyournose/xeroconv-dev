@@ -125,7 +125,7 @@ type FileEntry = {
 
 //export type FileInfoEntry = FileInfo
 export type FileInfoEntry = BaseEntry & FileInfo & FileEntry
-export type TFileInfoEntry = FileInfoEntry & Timestamp & ShotCount
+export type TFileInfoEntry = FileInfoEntry & {stats?: SessionStats}
 export type ShotEntry = FileId & Shot
 //export type ShotEntry = BaseEntry & FShot
 export type SessionStatsEntry = FileId & SessionStats
