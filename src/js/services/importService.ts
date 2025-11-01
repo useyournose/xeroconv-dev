@@ -2,8 +2,12 @@ import db from "../db";
 import { Shot, SessionStats,SessionUnits, SessionUnitsEntry, FileInfoEntry, SessionStatsEntry, ShotEntry, ShotSession } from "../_types"
 
 
-export async function AddFile(name: string, title: string, deviceid: string):Promise<number> {
-  return await db.files.add({name: name, title: title, deviceid: deviceid, exported: 0, added: Date.now(), checked: 0} as FileInfoEntry)
+export async function AddFile(name: string, title: string, deviceid: string, checksum?: string):Promise<number> {
+  if (await db.files.where('checksum').equals(checksum).count() == 0 ) {
+    return await db.files.add({name: name, title: title, deviceid: deviceid, exported: 0, added: Date.now(), checked: 0, checksum: checksum} as FileInfoEntry)
+  } else {
+    return Promise.reject("File with the same checksum already exists in IndexedDB")
+  }
 }
 
 export async function AddStats(
@@ -41,7 +45,7 @@ export async function AddShots(fileid: number, shots:Shot[]) {
 
 export async function AddSession(Session:ShotSession):Promise<number> {
   return new Promise(async (resolve,reject) => {
-    await AddFile(Session.file.name, Session.file.title, Session.file.deviceid)
+    await AddFile(Session.file.name, Session.file.title, Session.file.deviceid, Session.file.checksum)
     .then(async (db_fileid) => {
       Promise.all([
         Promise.resolve(db_fileid),
@@ -68,6 +72,9 @@ export async function AddSession(Session:ShotSession):Promise<number> {
         console.log("[json2db]: added" );
         resolve(values[0]);
       })
+    })
+    .catch((err) => {
+      return reject(err)
     })
   })
 }

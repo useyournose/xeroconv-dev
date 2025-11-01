@@ -55,7 +55,7 @@ export async function handleFiles(files:readonly FileSystemFileHandle[] | FileLi
         } else if (/\.csv$/g.test(file.name)) {
             return csv2json(fileData, file.name)
                 .then(async (Session) => {
-                    if (indexedDBavailable) {const fid = await AddSession(Session as ShotSession)}
+                    if (indexedDBavailable) {const fid = await AddSession(Session as ShotSession).catch(err => showError(err))}
                     return json2Labradar(Session as ShotSession)
                     }
                 )                

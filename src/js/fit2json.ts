@@ -2,6 +2,7 @@ import { Stream, Decoder } from "@garmin/fitsdk";
 import StandardDeviation from "./StandardDeviation";
 import get_ke from "./get_ke";
 import nnf from "./nnf";
+import { crc32Hex } from "./crc32";
 
 import { FileInfo, SessionStats, SessionUnits, ShotSession} from "./_types";
 
@@ -10,6 +11,8 @@ export default async function fit2json(fileData:ArrayBuffer,ofilename:string):Pr
   return new Promise(async (resolve,reject) => {
     const start = Date.now();
     const filename = ofilename.replace(/\.fit$/, '-xeroconv.csv');
+    
+    const checksum = crc32Hex(fileData)
     const streamfromFileSync = Stream.fromArrayBuffer(fileData);
     const decoder = new Decoder(streamfromFileSync);
     console.log("[fit2json]: " + ofilename + " isFIT (instance method): " + decoder.isFIT());
@@ -58,6 +61,7 @@ export default async function fit2json(fileData:ArrayBuffer,ofilename:string):Pr
           name: ofilename,
           title: ofilename,
           deviceid: DeviceData.manufacturer +'-'+ DeviceData.serialNumber.toString(),
+          checksum: checksum
         } as FileInfo,
         stats: {
           shots_total: SessionData.shotCount,

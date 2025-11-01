@@ -4,7 +4,7 @@ import { openModal, closeModal, closeAllModals } from "./js/modals";
 import {autoBinDatasets, renderHistogram, renderHistogramOverlay, renderKDEOverlay } from "./js/histogram";
 import {renderTable} from "./js/renderTable"
 import { GetCheckedShots, MarkFileAsChecked, MarkFileAsUnchecked } from "./js/services/queryService";
-//import { BeforeInstallPromptEvent, LaunchParams } from "./js/_types";
+import { allowedFileExtensions, allowedFileTypes } from "./js/_types";
 
 document.addEventListener('DOMContentLoaded', () => {
   const feature_IndexedDB = 'indexedDB' in window;
@@ -128,12 +128,59 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
 
+  //radio button to switch units
   document.getElementById('units-radio').addEventListener('change', () => {
     const targetunits = (document.getElementById('units-imperial') as HTMLFormElement).checked
     GetCheckedShots(targetunits)
     .then(shots => renderKDEOverlay('histogramCanvas', shots))
     //.then( shots => autoBinDatasets(shots))
     //.then( result => renderHistogramOverlay('histogramCanvas', result.labels, result.datasets))
+  });
+
+
+  // drag and drop files
+
+  document.getElementById("x2l").addEventListener("drop", (event) => {
+      event.preventDefault();
+      const files = [...event.dataTransfer.items]
+      .map((item) => item.getAsFile())
+      .filter((file) => allowedFileTypes.includes(file.type) || allowedFileExtensions.includes(file.name.split('.').pop()))
+      handleFiles(files, feature_IndexedDB)
+      .finally(() => {(event.target as HTMLInputElement).value = ''})
+  });
+
+  document.getElementById("x2l").addEventListener("dragover", (e) => {
+  const fileItems = [...e.dataTransfer.items].filter(
+    (item) => item.kind === "file",
+  );
+  if (fileItems.length > 0) {
+    e.preventDefault();
+    //if (fileItems.some((item) => allowedFileTypes.includes(item.type))) {
+      e.dataTransfer.dropEffect = "copy";
+    //} else {
+    //  fileItems.some((item) => console.log(item.kind))
+    //  e.dataTransfer.dropEffect = "none";
+    //}
+  }
+  });
+
+  window.addEventListener("dragover", (e) => {
+    const fileItems = [...e.dataTransfer.items].filter(
+      (item) => item.kind === "file",
+    );
+    if (fileItems.length > 0) {
+      e.preventDefault();
+      if (!(document.getElementById("x2l")).contains(e.target as HTMLInputElement)) {
+        e.dataTransfer.dropEffect = "none";
+      }
+    }
+  });
+
+  // prevent the browser from it's default bahaviour of downloading drag&dropped files
+  window.addEventListener("drop", (e) => {
+    if ([...e.dataTransfer.items].some((item) => item.kind === "file")) {
+      e.preventDefault();
+    }
   });
 
 });

@@ -1,6 +1,8 @@
 import Chart from 'chart.js/auto'
+import {Colors} from 'chart.js'
 import {HistogramDatasetBinned, RawDataset, BinnedDataset, BinningResult} from "./_types"
 
+Chart.register(Colors);
 
 type HistogramData = number[];
 
@@ -247,11 +249,12 @@ export function renderKDEOverlay(canvasId:string, RawData:RawDataset[]): Chart |
     (el as any)._chart.destroy();
   }
 
-    // Gemeinsame X-Achse für Dichten
+  // Gemeinsame X-Achse für Dichten
   const globalMin = Math.min(...RawData.flatMap(({values}) => values));
   const globalMax = Math.max(...RawData.flatMap(({values}) => values));
+  const widener = (globalMax-globalMin) * 0.25
   const xValues: number[] = [];
-  for (let x = globalMin; x <= globalMax; x += 0.2) xValues.push(x);
+  for (let x = globalMin - widener; x <= globalMax + widener; x += 0.2) xValues.push(x);
 
   // Datasets sammeln
   const datasets: any[] = [];
@@ -304,13 +307,14 @@ export function renderKDEOverlay(canvasId:string, RawData:RawDataset[]): Chart |
       type: "line",
       label: `${s.label} KDE`,
       data: kdeValues.map(v => v * s.values.length * binWidth),
-      borderColor: s.color,
+      //borderColor: s.color,
       fill: false,
       tension: 0.2,
       xAxisID: "xDensity",
       yAxisID: "y"
     });
   });
+
 
   // Chart Config
     const chart = new Chart(el,{
@@ -325,12 +329,25 @@ export function renderKDEOverlay(canvasId:string, RawData:RawDataset[]): Chart |
           xDensity: {
             type: "linear",
             position: "bottom",
-            min: globalMin,
-            max: globalMax,
-            title: { display: true, text: "Speed" }
+            min: globalMin - widener,
+            max: globalMax + widener,
+            title: { display: true, text: "Velocity" }
           },
           y: {
             title: { display: true, text: "Density" }
+          }
+        },
+        elements: {
+          point: {
+            pointStyle: false
+          }
+        },
+        plugins:{
+          /*autocolors: {
+            mode: 'dataset'
+          },*/
+          colors: {
+            enabled: true
           }
         }
       }

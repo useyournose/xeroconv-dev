@@ -3,6 +3,7 @@ import nnf from "./nnf";
 import getdatestring, { gettimestamp } from "./getdatestring";
 import {AddFile, AddShots, AddStats, AddUnits } from "./services/importService"
 import {FileInfo, SessionStats, SessionUnits, ShotSession } from "./_types";
+import { crc32Hex } from "./crc32";
 
 
 export default function csv2json(fileData:ArrayBuffer|string,ofilename:string):Promise<ShotSession> {
@@ -10,6 +11,7 @@ export default function csv2json(fileData:ArrayBuffer|string,ofilename:string):P
     const start = Date.now();
     const dec = new TextDecoder("utf-8")
     const source:string = typeof fileData != 'string' /* 'object'*/ ? dec.decode(fileData as ArrayBuffer) : fileData
+    const checksum = typeof fileData != 'string' ? crc32Hex(fileData) : () => { const enc = new TextEncoder(); crc32Hex(enc.encode(source).buffer) }
     const cleansource = source.replace(/, /g,',')
     let sourceparts = cleansource.split(/-,{3,}[\n]/)
     let fallback = false
@@ -124,6 +126,7 @@ export default function csv2json(fileData:ArrayBuffer|string,ofilename:string):P
           name: ofilename,
           title: ofilename,
           deviceid: "useyournose-xeroconv",
+          checksum: checksum
         } as FileInfo,
         stats: {
           shots_total: shots.data.length as number,
