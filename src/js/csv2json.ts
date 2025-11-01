@@ -11,7 +11,13 @@ export default function csv2json(fileData:ArrayBuffer|string,ofilename:string):P
     const start = Date.now();
     const dec = new TextDecoder("utf-8")
     const source:string = typeof fileData != 'string' /* 'object'*/ ? dec.decode(fileData as ArrayBuffer) : fileData
-    const checksum = typeof fileData != 'string' ? crc32Hex(fileData) : () => { const enc = new TextEncoder(); crc32Hex(enc.encode(source).buffer) }
+    let checksum:string
+    if (typeof fileData != 'string') {
+      checksum = crc32Hex(fileData)
+    } else {
+      const enc = new TextEncoder();
+      checksum = crc32Hex(enc.encode(source).buffer)
+    }
     const cleansource = source.replace(/, /g,',')
     let sourceparts = cleansource.split(/-,{3,}[\n]/)
     let fallback = false
