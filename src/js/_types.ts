@@ -80,6 +80,7 @@ export type FileInfo = {
     name: string,
     title: string,
     deviceid: string,
+    checksum?: string
 }
 
 export type Shot = {
@@ -139,3 +140,17 @@ export type HistogramDatasetBinned = { label: string; data: number[]; color: str
 export type RawDataset = { label: string; values: number[]; color: string };
 export type BinnedDataset = { label: string; data: number[]; color: string };
 export type BinningResult = { labels: string[]; edges: number[]; datasets: BinnedDataset[] };
+
+export const allowedFileTypes = [
+        "text/csv",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ant.fit"
+    ]
+
+export const allowedFileExtensions = [
+        "csv",
+        "xls",
+        "xlsx",
+        "fit"
+    ]

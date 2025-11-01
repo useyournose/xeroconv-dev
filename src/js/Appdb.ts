@@ -12,7 +12,7 @@ export class AppDB extends Dexie {
   constructor(name?: string, options?: DexieOptions) {
     super(name, options);
     this.version(1).stores({
-        files: '++id, name, checked',
+        files: '++id, name, checked, checksum',
         stats: '++, fileid',
         units: '++, fileid',
         shots: '++, fileid, shotnumber'

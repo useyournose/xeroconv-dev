@@ -73,7 +73,7 @@ export async function GetCheckedShots(targetunits: boolean = false):Promise<RawD
         const velocities = shots.map(s => convvelo(s.velocity,units.velocity,targetunits ));
         speedDatasets.push(
             { 
-                label: file.name,
+                label: file.id.toString() + " " + file.name,
                 values: velocities,
                 color: bulmaColorRGBA((ix + 1) /arr.length)
             }
