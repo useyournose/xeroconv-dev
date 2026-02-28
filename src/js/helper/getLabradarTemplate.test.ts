@@ -1,5 +1,5 @@
 import {expect, test} from '@jest/globals';
-import getLabradartemplate from '../js/getLabradarTemplate';
+import getLabradartemplate from './getLabradarTemplate';
 const expectation=`sep=;
 Device ID;{DEVICEID};;
 

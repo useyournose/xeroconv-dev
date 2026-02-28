@@ -1,5 +1,5 @@
 import { test, expect } from 'bun:test';
-import nnf from '../js/nnf';
+import nnf from './nnf';
 
 test('1,00 should become 1', () => {
   expect(nnf('1,23')).toBe(1.23);

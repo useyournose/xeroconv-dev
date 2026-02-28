@@ -47,7 +47,7 @@ export async function handleFiles(files:readonly FileSystemFileHandle[] | FileLi
         if (/\.fit$/g.test(file.name)) {
             return fit2json(fileData, file.name)
                 .then(async (Session) => {
-                    if (indexedDBavailable) {const fid = await AddSession(Session as ShotSession)}
+                    if (indexedDBavailable) {const fid = await AddSession(Session as ShotSession).catch(err => showError(err))}
                     return json2Labradar(Session as ShotSession)
                     }
                 )                

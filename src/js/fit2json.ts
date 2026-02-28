@@ -1,8 +1,8 @@
 import { Stream, Decoder } from "@garmin/fitsdk";
-import StandardDeviation from "./StandardDeviation";
-import get_ke from "./get_ke";
-import nnf from "./nnf";
-import { crc32Hex } from "./crc32";
+import { StandardDeviation } from "./helper/StandardDeviation";
+import get_ke from "./helper/get_ke";
+import nnf from "./helper/nnf";
+import { crc32Hex } from "./helper/crc32";
 
 import { FileInfo, SessionStats, SessionUnits, ShotSession} from "./_types";
 

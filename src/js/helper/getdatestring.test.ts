@@ -1,5 +1,5 @@
 import {expect, test} from "bun:test";
-import getdatestring, {gettimestamp} from '../js/getdatestring';
+import getdatestring, {gettimestamp} from './getdatestring';
 
 test('convert western time, capital month', () => {
     const probe = "JULI 02,2024 17:08";
