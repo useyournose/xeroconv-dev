@@ -1,7 +1,7 @@
 import db from "../db";
 import {SessionStats, Shot, SessionUnits, TFileInfoEntry, RawDataset} from '../_types'
-import ms_to_fs from "../ms_to_fs";
-import fs_to_ms from "../fs_to_ms";
+import ms_to_fs from "../helper/ms_to_fs";
+import fs_to_ms from "../helper/fs_to_ms";
 
 export async function GetFiles():Promise<TFileInfoEntry[]>{
 
@@ -73,9 +73,11 @@ export async function GetCheckedShots(targetunits: boolean = false):Promise<RawD
         const velocities = shots.map(s => convvelo(s.velocity,units.velocity,targetunits ));
         speedDatasets.push(
             { 
-                label: file.id.toString() + " " + file.name,
+                label: file.id.toString() + ": " + file.name,
                 values: velocities,
-                color: bulmaColorRGBA((ix + 1) /arr.length)
+                //color: bulmaColorRGBA((ix + 1) /arr.length)
+                // take che checksum, shorten it
+                color: '#' + file.checksum.toUpperCase().substring(0,6)
             }
         )
     }))

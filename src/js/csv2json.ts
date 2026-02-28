@@ -1,9 +1,9 @@
 import Papa, { ParseResult } from "papaparse";
-import nnf from "./nnf";
-import getdatestring, { gettimestamp } from "./getdatestring";
+import nnf from "./helper/nnf";
+import getdatestring, { gettimestamp } from "./helper/getdatestring";
 import {AddFile, AddShots, AddStats, AddUnits } from "./services/importService"
 import {FileInfo, SessionStats, SessionUnits, ShotSession } from "./_types";
-import { crc32Hex } from "./crc32";
+import { crc32Hex } from "./helper/crc32";
 
 
 export default function csv2json(fileData:ArrayBuffer|string,ofilename:string):Promise<ShotSession> {

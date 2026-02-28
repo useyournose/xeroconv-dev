@@ -25,9 +25,9 @@ export async function renderTable() {
         tdId.textContent = elem.id.toString() ?? "";
         tr.appendChild(tdId);
 
-        const tdName = document.createElement("td");
+        /*const tdName = document.createElement("td");
         tdName.textContent = elem.name ?? "";
-        tr.appendChild(tdName);
+        tr.appendChild(tdName);*/
 
         const tdTitle = document.createElement("td");
         tdTitle.textContent = elem.title ?? "";

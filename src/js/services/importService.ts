@@ -69,7 +69,7 @@ export async function AddSession(Session:ShotSession):Promise<number> {
         AddShots(db_fileid,Session.shots)
       ])
       .then((values) => {
-        console.log("[json2db]: added" );
+        console.log("[json2db]: added " + Session.file.name );
         resolve(values[0]);
       })
     })

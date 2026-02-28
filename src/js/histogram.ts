@@ -1,30 +1,33 @@
 import Chart from 'chart.js/auto'
-import {Colors} from 'chart.js'
-import {HistogramDatasetBinned, RawDataset, BinnedDataset, BinningResult} from "./_types"
+import {ChartConfiguration, Colors, Legend, LegendElement, LegendItem, LegendOptions, ChartEvent } from 'chart.js'
+import {HistogramDatasetBinned, RawDataset, BinnedDataset, BinningResult } from "./_types"
+import { bulmaTextColor } from './helper/getComputedStyle';
+import { mean } from './helper/mean'
+import { stddev } from './helper/StandardDeviation'
+import { normalPDF } from './helper/NormalDistribution';
+import { kde } from './helper/KernelDensityEstimation';
+import { std } from './helper/SampleStandardDeviation';
+import { sturgesCount } from './helper/SturgesCount';
+import { fdCount } from './helper/FriedmanDiaconisBin';
 
 Chart.register(Colors);
 
 type HistogramData = number[];
 
-function mean(arr: number[]): number {
-  return arr.reduce((a, b) => a + b, 0) / arr.length;
-}
-function stddev(arr: number[], mu: number): number {
-  return Math.sqrt(arr.reduce((s, x) => s + (x - mu) ** 2, 0) / arr.length);
-}
-function normalPDF(x: number, mu: number, sigma: number): number {
-  return (1 / (sigma * Math.sqrt(2 * Math.PI))) *
-         Math.exp(-0.5 * ((x - mu) / sigma) ** 2);
-}
-function gaussianKernel(u: number): number {
-  return (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * u * u);
-}
-function kde(xs: number[], data: number[], bandwidth: number): number[] {
-  return xs.map(x =>
-    data.reduce((sum, xi) => sum + gaussianKernel((x - xi) / bandwidth), 0) /
-    (data.length * bandwidth)
-  );
-}
+const newLegendClickHandler = function (e: ChartEvent, legendItem: LegendItem, legend: any) {
+    const index = legendItem.datasetIndex;
+    const type = legend.chart.config.type;
+
+    let ci = legend.chart;
+    [
+        ci.getDatasetMeta(index),
+        ci.getDatasetMeta(index + 1),
+        ci.getDatasetMeta(index + 2)
+    ].forEach(function(meta) {
+        meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+    });
+    ci.update();
+};
 
 function binData(data: HistogramData, binSize: number): { labels: string[]; counts: number[] } {
   const min = Math.min(...data);
@@ -99,47 +102,17 @@ export function autoBinDatasets(
   const max = Math.max(...allValues);
   const range = Math.max(Number.EPSILON, max - min);
 
-  function sturgesCount(): number {
-    return Math.max(1, Math.ceil(Math.log2(n) + 1));
-  }
-
   function sqrtCount(): number {
     return Math.max(1, Math.ceil(Math.sqrt(n)));
   }
 
-  function fdCount(): number {
-    // Freedman-Diaconis bin width: 2 * IQR / n^(1/3) -> bins = range / h
-    const sorted = [...allValues].sort((a, b) => a - b);
-    const q1 = quantile(sorted, 0.25);
-    const q3 = quantile(sorted, 0.75);
-    const iqr = q3 - q1 || medianAbsoluteDeviation(sorted) || 1e-9;
-    const h = 2 * iqr / Math.cbrt(n) || range / Math.max(1, Math.cbrt(n));
-    const bins = Math.max(1, Math.ceil(range / h));
-    return bins;
-  }
-
-  function quantile(sorted: number[], p: number) {
-    const idx = (sorted.length - 1) * p;
-    const lo = Math.floor(idx);
-    const hi = Math.ceil(idx);
-    if (hi === lo) return sorted[lo];
-    const w = idx - lo;
-    return sorted[lo] * (1 - w) + sorted[hi] * w;
-  }
-
-  function medianAbsoluteDeviation(sorted: number[]) {
-    const med = quantile(sorted, 0.5);
-    const devs = sorted.map(v => Math.abs(v - med)).sort((a, b) => a - b);
-    return quantile(devs, 0.5);
-  }
-
   let kRaw: number;
   if (method === 'fd') {
-    kRaw = fdCount();
+    kRaw = fdCount(allValues, n, range);
   } else if (method === 'sqrt') {
     kRaw = sqrtCount();
   } else {
-    kRaw = sturgesCount();
+    kRaw = sturgesCount(n);
   }
 
   // For very small n (3-20), force a sensible minimum and maximum
@@ -256,6 +229,13 @@ export function renderKDEOverlay(canvasId:string, RawData:RawDataset[]): Chart |
   const xValues: number[] = [];
   for (let x = globalMin - widener; x <= globalMax + widener; x += 0.2) xValues.push(x);
 
+  // Gemeinsames h
+  function silverman(data:number[]):number {
+    const sd=std(data), n=data.length; return 1.06*sd*Math.pow(n,-1/5);
+  }
+  const pooledValues = RawData.flatMap(d => d.values).filter(Number.isFinite);
+  const pooledh = silverman(pooledValues)
+
   // Datasets sammeln
   const datasets: any[] = [];
 
@@ -278,7 +258,8 @@ export function renderKDEOverlay(canvasId:string, RawData:RawDataset[]): Chart |
 
     // KDE
     const h = 1.06 * sigma * Math.pow(s.values.length, -1 / 5);
-    const kdeValues = kde(xValues, s.values, h);
+    //const kdeValues = kde(xValues, s.values, h);
+    const kdeValues = kde(xValues, s.values, pooledh);
 
     // Histogramm-Dataset
     /*datasets.push({
@@ -304,58 +285,98 @@ export function renderKDEOverlay(canvasId:string, RawData:RawDataset[]): Chart |
 
     // KDE
     datasets.push({
-      type: "line",
-      label: `${s.label} KDE`,
-      data: kdeValues.map(v => v * s.values.length * binWidth),
-      //borderColor: s.color,
+      type: 'line',
+      label: s.label, 
+      data: kdeValues.map(v => v * s.values.length * binWidth).map(value => value === 0 ? null : value),
+      borderColor: s.color,
+      backgroundColor: s.color + 'AA',
       fill: false,
       tension: 0.2,
       xAxisID: "xDensity",
-      yAxisID: "y"
+      yAxisID: "y",
+      pointStyle: false, 
+      order: 1
     });
+
+    const maxY = Math.max(...kdeValues.flatMap(v => v * s.values.length * binWidth));
+
+    // shots
+    datasets.push({
+      type: "scatter",
+      data: s.values.map((v) => { return {x: v, y: maxY * 0.1 };}),
+      label: s.label + ` - Shot`,
+      showLine: false,
+      borderColor: s.color,
+      backgroundColor: s.color + '77',
+      pointRadius: 5,
+      xAxisID: "xDensity",
+      order: 3
+    })
+
+    // average bar    
+    datasets.push({
+      type: 'line',
+      label: s.label + ' - AVG',
+      data: [{ x: mu, y: 0 }, { x: mu, y: maxY || 2 }],
+      borderColor: s.color,
+      borderWidth: 2,
+      borderDash: [6, 6],
+      pointRadius: 0,
+      tension: 0,
+      fill: false,
+      // Put scales & z index so these lines render above KDE curves
+      order: 2,
+      xAxisID: "xDensity",
+      yAxisID: "y",
+    });
+
   });
 
-
   // Chart Config
-    const chart = new Chart(el,{
-      type: "line",
-      data: {
-        labels: xValues.map(v => v.toFixed(1)), // für Dichten
-        datasets
+
+  const cfg:ChartConfiguration = {
+    type: "line",
+    data: {
+      labels: xValues.map(v => v.toFixed(1)), // für Dichten
+      datasets
+    },
+    options: {
+      responsive: true,
+      scales: {
+        xDensity: {
+          type: "linear",
+          position: "bottom",
+          min: globalMin - widener,
+          max: globalMax + widener,
+          title: { display: true, text: "Velocity",color: bulmaTextColor },
+          grid: {color: bulmaTextColor},
+          ticks: {color: bulmaTextColor}
+        },
+        y: {
+          title: { display: true, text: "Density", color: bulmaTextColor },
+          grid: {color: bulmaTextColor},
+          ticks: {color: bulmaTextColor}
+        }
       },
-      options: {
-        responsive: true,
-        scales: {
-          xDensity: {
-            type: "linear",
-            position: "bottom",
-            min: globalMin - widener,
-            max: globalMax + widener,
-            title: { display: true, text: "Velocity" }
+      plugins:{
+        legend: {
+          labels: {
+            filter: (legendItem, chart) => {
+              const ds = chart.datasets[legendItem.datasetIndex!];
+              return ds.type !== 'scatter' && !ds.label.endsWith(" - AVG");
+            },
+            color: bulmaTextColor
           },
-          y: {
-            title: { display: true, text: "Density" }
-          }
-        },
-        elements: {
-          point: {
-            pointStyle: false
-          }
-        },
-        plugins:{
-          /*autocolors: {
-            mode: 'dataset'
-          },*/
-          colors: {
-            enabled: true
-          }
+          onClick: newLegendClickHandler
         }
       }
-    });
+    }
+  }
+  
+  const chart = new Chart(el,cfg);
 
   // store reference for later cleanup
   // @ts-ignore
   (el as any)._chart = chart;
   return chart;
-
 }
